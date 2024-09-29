@@ -4,6 +4,7 @@ import com.burakbayramin.mini_banking_app.dto.request.AccountCreateRequest;
 import com.burakbayramin.mini_banking_app.dto.request.AccountSearchRequest;
 import com.burakbayramin.mini_banking_app.dto.request.AccountUpdateRequest;
 import com.burakbayramin.mini_banking_app.dto.response.AccountResponse;
+import com.burakbayramin.mini_banking_app.dto.response.StatusResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +18,7 @@ public interface AccountService {
      * @param request Hesap oluşturma isteği DTO'su
      * @return Oluşturulan hesabın detayları DTO'su
      */
-    AccountResponse createAccount(UUID userId, AccountCreateRequest request);
+    void createAccount(UUID userId, AccountCreateRequest request);
 
     /**
      * Hesapları arar ve filtreler.
@@ -36,7 +37,7 @@ public interface AccountService {
      * @param request   Hesap güncelleme isteği DTO'su
      * @return Güncellenen hesabın detayları DTO'su
      */
-    AccountResponse updateAccount(UUID userId, UUID accountId, AccountUpdateRequest request);
+    void updateAccount(UUID userId, UUID accountId, AccountUpdateRequest request);
 
     /**
      * Hesabı siler.

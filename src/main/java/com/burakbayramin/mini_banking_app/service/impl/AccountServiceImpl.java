@@ -4,6 +4,7 @@ import com.burakbayramin.mini_banking_app.dto.request.AccountCreateRequest;
 import com.burakbayramin.mini_banking_app.dto.request.AccountSearchRequest;
 import com.burakbayramin.mini_banking_app.dto.request.AccountUpdateRequest;
 import com.burakbayramin.mini_banking_app.dto.response.AccountResponse;
+import com.burakbayramin.mini_banking_app.dto.response.StatusResponse;
 import com.burakbayramin.mini_banking_app.exception.BadRequestException;
 import com.burakbayramin.mini_banking_app.exception.ConflictException;
 import com.burakbayramin.mini_banking_app.exception.ResourceNotFoundException;
@@ -39,7 +40,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Transactional
-    public AccountResponse createAccount(UUID userId, AccountCreateRequest request) {
+    public void createAccount(UUID userId, AccountCreateRequest request) {
         // Kullanıcıyı bul
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
@@ -58,8 +59,6 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountMapper.toAccount(request, user);
 
         Account savedAccount = accountRepository.save(account);
-
-        return accountMapper.toAccountResponse(savedAccount);
     }
 
     /**
@@ -92,7 +91,7 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     @Transactional
-    public AccountResponse updateAccount(UUID userId, UUID accountId, AccountUpdateRequest request) {
+    public void updateAccount(UUID userId, UUID accountId, AccountUpdateRequest request) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", accountId));
 
@@ -107,9 +106,7 @@ public class AccountServiceImpl implements AccountService {
         }
 
         account.setName(request.getName());
-        Account updatedAccount = accountRepository.save(account);
-
-        return accountMapper.toAccountResponse(updatedAccount);
+        accountRepository.save(account);
     }
 
     /**

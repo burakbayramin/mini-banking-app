@@ -18,9 +18,13 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
 
 jwt:
-  secret: burak
+  secret: PN7g9X$K2mF#qL8zR4vJ@bH3wY6tA5cE
   expiration: 86400000
 
 springdoc:

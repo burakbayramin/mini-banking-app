@@ -13,12 +13,12 @@ public class PathConstants {
 
     // Account Paths
     public static final String ACCOUNTS = API + "/accounts";
-    public static final String CREATE_ACCOUNT = ACCOUNTS;
+    //public static final String CREATE_ACCOUNT = ACCOUNTS;
     public static final String SEARCH_ACCOUNTS = ACCOUNTS + "/search";
     public static final String ACCOUNT_ID = ACCOUNTS + "/{id}";
-    public static final String UPDATE_ACCOUNT = ACCOUNT_ID;
-    public static final String DELETE_ACCOUNT = ACCOUNT_ID;
-    public static final String VIEW_ACCOUNT_DETAILS = ACCOUNT_ID;
+//    public static final String UPDATE_ACCOUNT = ACCOUNT_ID;
+//    public static final String DELETE_ACCOUNT = ACCOUNT_ID;
+//    public static final String VIEW_ACCOUNT_DETAILS = ACCOUNT_ID;
 
     // Transaction Paths
     public static final String TRANSACTIONS = API + "/transactions";

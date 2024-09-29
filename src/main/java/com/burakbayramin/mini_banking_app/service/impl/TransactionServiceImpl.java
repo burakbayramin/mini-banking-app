@@ -1,6 +1,7 @@
 package com.burakbayramin.mini_banking_app.service.impl;
 
 import com.burakbayramin.mini_banking_app.dto.request.TransactionRequest;
+import com.burakbayramin.mini_banking_app.dto.response.StatusResponse;
 import com.burakbayramin.mini_banking_app.dto.response.TransactionResponse;
 import com.burakbayramin.mini_banking_app.exception.BadRequestException;
 import com.burakbayramin.mini_banking_app.exception.ResourceNotFoundException;
@@ -30,7 +31,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public TransactionResponse initiateMoneyTransfer(UUID userId, TransactionRequest request) {
+    public void initiateMoneyTransfer(UUID userId, TransactionRequest request) {
         // Gönderen hesabı bul
         Account fromAccount = accountRepository.findById(request.getFromAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", request.getFromAccountId()));
@@ -67,7 +68,6 @@ public class TransactionServiceImpl implements TransactionService {
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
 
-        return transactionMapper.toTransactionResponse(savedTransaction);
     }
 
     /**
