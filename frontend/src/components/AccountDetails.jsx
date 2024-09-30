@@ -43,9 +43,9 @@ const AccountDetails = () => {
   return (
     <div>
       <h2>{account.name}</h2>
-      <p>Numara: {account.number}</p>
-      <p>Bakiye: {account.balance}</p>
-      <button onClick={() => navigate(`/transactions/${account.id}`)}>İşlem Geçmişini Gör</button>
+      <p>Account Number: {account.number}</p>
+      <p>Balance: {account.balance}</p>
+      <button onClick={() => navigate(`/transactions/${account.id}`)}>View Transaction History</button>
       {isEditing ? (
         <>
           <input
@@ -58,13 +58,13 @@ const AccountDetails = () => {
             value={accountData.number}
             onChange={(e) => setAccountData({ ...accountData, number: e.target.value })}
           />
-          <button onClick={handleUpdate}>Güncelle</button>
-          <button onClick={() => setIsEditing(false)}>İptal</button>
+          <button onClick={handleUpdate}>Update</button>
+          <button onClick={() => setIsEditing(false)}>Cancel</button>
         </>
       ) : (
         <>
-          <button onClick={() => setIsEditing(true)}>Düzenle</button>
-          <button onClick={handleDelete}>Sil</button>
+          <button onClick={() => setIsEditing(true)}>Edit</button>
+          <button onClick={handleDelete}>Delete</button>
         </>
       )}
     </div>

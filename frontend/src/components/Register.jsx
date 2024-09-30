@@ -16,7 +16,7 @@ const Register = () => {
         navigate('/login');
       })
       .catch((error) => {
-        setError('Kayıt başarısız: ' + error.response.data.message);
+        setError('Registration failed:' + error.response.data.message);
       });
   };
 
@@ -24,12 +24,12 @@ const Register = () => {
     <Container maxWidth="xs">
       <Box sx={{ mt: 8 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          Kayıt Ol
+          Register
         </Typography>
         {error && <Alert severity="error">{error}</Alert>}
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
           <TextField
-            label="Kullanıcı Adı"
+            label="Username"
             fullWidth
             margin="normal"
             value={userData.username}
@@ -37,7 +37,7 @@ const Register = () => {
             required
           />
           <TextField
-            label="Şifre"
+            label="Password"
             type="password"
             fullWidth
             margin="normal"
@@ -55,7 +55,7 @@ const Register = () => {
             required
           />
           <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-            Kayıt Ol
+            Register
           </Button>
         </Box>
       </Box>

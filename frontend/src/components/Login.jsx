@@ -21,7 +21,7 @@ const Login = () => {
         navigate('/');
       })
       .catch((error) => {
-        setError('Giriş başarısız: ' + error.response.data.message);
+        setError('Login failed:' + error.response.data.message);
       });
   };
 
@@ -29,12 +29,12 @@ const Login = () => {
     <Container maxWidth="xs">
       <Box sx={{ mt: 8 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          Giriş Yap
+          Login
         </Typography>
         {error && <Alert severity="error">{error}</Alert>}
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
           <TextField
-            label="Kullanıcı Adı"
+            label="Username"
             fullWidth
             margin="normal"
             value={credentials.username}
@@ -42,7 +42,7 @@ const Login = () => {
             required
           />
           <TextField
-            label="Şifre"
+            label="Password"
             type="password"
             fullWidth
             margin="normal"
@@ -51,7 +51,7 @@ const Login = () => {
             required
           />
           <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-            Giriş Yap
+            Login
           </Button>
         </Box>
       </Box>

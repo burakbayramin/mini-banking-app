@@ -30,11 +30,11 @@ const AccountList = () => {
     <Container maxWidth="md">
       <Box sx={{ mt: 4 }}>
         <Typography variant="h5" gutterBottom>
-          Hesaplarınız
+          Your accounts
         </Typography>
         <Box sx={{ display: 'flex', mb: 2 }}>
           <TextField
-            label="Hesap numarası veya adı"
+            label="Account number or name"
             variant="outlined"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

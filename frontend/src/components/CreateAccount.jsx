@@ -17,28 +17,28 @@ const CreateAccount = () => {
         navigate('/');
       })
       .catch((error) => {
-        console.error('Hesap oluşturulamadı:', error);
+        console.error('Account creation failed:', error);
       });
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Yeni Hesap Oluştur</h2>
+      <h2>Create Account</h2>
       <input
         type="text"
-        placeholder="Hesap Adı"
+        placeholder="Account Name"
         value={accountData.name}
         onChange={(e) => setAccountData({ ...accountData, name: e.target.value })}
         required
       />
       <input
         type="text"
-        placeholder="Hesap Numarası"
+        placeholder="Account Number"
         value={accountData.number}
         onChange={(e) => setAccountData({ ...accountData, number: e.target.value })}
         required
       />
-      <button type="submit">Oluştur</button>
+      <button type="submit">Create</button>
     </form>
   );
 };

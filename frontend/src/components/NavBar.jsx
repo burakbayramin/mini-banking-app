@@ -11,27 +11,27 @@ const NavBar = () => {
     <AppBar position="static">
       <Toolbar>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Mini Banka
+          Mini Bank
         </Typography>
         {authTokens ? (
           <>
             <Button color="inherit" onClick={() => navigate('/')}>
-              Hesaplarım
+              Accounts
             </Button>
             <Button color="inherit" onClick={() => navigate('/transfer')}>
-              Para Transferi
+              Transfer
             </Button>
             <Button color="inherit" onClick={logout}>
-              Çıkış Yap
+              Logout
             </Button>
           </>
         ) : (
           <>
             <Button color="inherit" onClick={() => navigate('/login')}>
-              Giriş Yap
+              Login
             </Button>
             <Button color="inherit" onClick={() => navigate('/register')}>
-              Kayıt Ol
+              Register
             </Button>
           </>
         )}

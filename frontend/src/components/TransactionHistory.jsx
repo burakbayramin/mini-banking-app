@@ -14,7 +14,7 @@ const TransactionHistory = () => {
         setTransactions(response.data);
       })
       .catch((error) => {
-        console.error('İşlem geçmişi yüklenemedi:', error);
+        console.error('Failed to load transaction history:', error);
       });
   }, [accountId]);
 
@@ -25,7 +25,7 @@ const TransactionHistory = () => {
 
   return (
     <div>
-      <h2>İşlem Geçmişi</h2>
+      <h2>Transaction History</h2>
       <ul>
         {accountTransactions.map((transaction) => (
           <li key={transaction.id}>
