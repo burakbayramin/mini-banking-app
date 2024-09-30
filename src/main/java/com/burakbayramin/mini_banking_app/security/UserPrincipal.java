@@ -23,8 +23,6 @@ public class UserPrincipal implements UserDetails {
 
     private String email;
 
-    // İlgili kullanıcı yetkilerini burada belirtebilirsiniz.
-    // Basit bir örnek olarak, tüm kullanıcılar "ROLE_USER" yetkisine sahip olacak.
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));

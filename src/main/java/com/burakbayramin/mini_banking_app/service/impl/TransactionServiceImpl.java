@@ -29,67 +29,79 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
     private final UserServiceImpl userService;
 
+    /**
+     * Initiates a money transfer from one account to another.
+     *
+     * @param userId  The UUID of the user initiating the transfer.
+     * @param request The TransactionRequest containing transfer details.
+     * @throws ResourceNotFoundException if either the source or destination account is not found.
+     * @throws BadRequestException       if the user does not have permission, attempts to transfer to the same account,
+     *                                   or has insufficient balance.
+     */
     @Override
     @Transactional
     public void initiateMoneyTransfer(UUID userId, TransactionRequest request) {
-        // Gönderen hesabı bul
+
+        // Retrieve the source account by its ID; throw exception if not found
         Account fromAccount = accountRepository.findById(request.getFromAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", request.getFromAccountId()));
 
-        // Alıcı hesabı bul
+        // Retrieve the destination account by its ID; throw exception if not found
         Account toAccount = accountRepository.findById(request.getToAccountId())
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", request.getToAccountId()));
 
-        // Gönderen hesabın sahibi mi kontrol et
+        // Verify that the source account belongs to the initiating user
         if (!fromAccount.getUser().getId().equals(userId)) {
             throw new BadRequestException("You do not have permission to send from this account.");
         }
 
-        // Gönderen ve alıcı hesap aynı mı kontrol et
+        // Prevent transferring to the same account
         if (fromAccount.getId().equals(toAccount.getId())) {
             throw new BadRequestException("Cannot transfer to the same account.");
         }
 
-        // Gönderen hesabın bakiyesi yeterli mi kontrol et
+        // Check if the source account has sufficient balance for the transfer
         if (fromAccount.getBalance().compareTo(request.getAmount()) < 0) {
             throw new BadRequestException("Insufficient balance in the from account.");
         }
 
-        // İşlemi oluştur
         Transaction transaction = transactionMapper.toTransaction(request, fromAccount, toAccount);
-        transaction.setStatus(TransactionStatus.SUCCESS); // İşlem başarıyla tamamlandı
+        transaction.setStatus(TransactionStatus.SUCCESS);
 
-        // Bakiyeleri güncelle
+        // Update account balances
         fromAccount.setBalance(fromAccount.getBalance().subtract(request.getAmount()));
         toAccount.setBalance(toAccount.getBalance().add(request.getAmount()));
 
-        // İşlemi kaydet
-        Transaction savedTransaction = transactionRepository.save(transaction);
+        // Save the transaction and updated account balances to the database
+        transactionRepository.save(transaction);
         accountRepository.save(fromAccount);
         accountRepository.save(toAccount);
 
     }
 
     /**
-     * Belirtilen bir hesabın işlem geçmişini getirir.
+     * Retrieves the transaction history for a specific account belonging to a user.
      *
-     * @param userId    Kullanıcının UUID ID'si
-     * @param accountId Hesabın UUID ID'si
-     * @return İşlem listesi DTO'larının listesi
+     * @param userId    The UUID of the user requesting the transaction history.
+     * @param accountId The UUID of the account for which to retrieve transactions.
+     * @return A list of TransactionResponse DTOs representing the transaction history.
+     * @throws ResourceNotFoundException if the account is not found.
+     * @throws BadRequestException       if the user does not have permission to view the account's transactions.
      */
     @Override
     @Transactional
     public List<TransactionResponse> viewTransactionHistory(UUID userId, UUID accountId) {
-        // Hesabı bul
+
+        // Retrieve the account by its ID; throw exception if not found
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", accountId));
 
-        // Hesap sahibi mi kontrol et
+        // Verify that the account belongs to the requesting user
         if (!account.getUser().getId().equals(userId)) {
             throw new BadRequestException("You do not have permission to view this account's transactions.");
         }
 
-        // İşlem geçmişini getir
+        // Retrieve all transactions where the account is either the source or destination
         List<Transaction> transactions = transactionRepository.findByFromAccountIdOrToAccountId(accountId, accountId);
 
         return transactions.stream()

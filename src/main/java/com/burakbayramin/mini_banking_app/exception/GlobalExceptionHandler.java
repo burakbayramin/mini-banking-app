@@ -21,22 +21,37 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // 1. UserAlreadyExistsException Handler
+    /**
+     * Handles UserAlreadyExistsException.
+     *
+     * @param ex      the exception thrown when a user already exists
+     * @param request the HTTP request that resulted in the exception
+     * @return a ResponseEntity containing the ErrorResponse with HTTP status 409 (Conflict)
+     */
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException ex, HttpServletRequest request) {
+        // Log the exception message at the error level
         logger.error("UserAlreadyExistsException: {}", ex.getMessage());
 
+        // Create an ErrorResponse object with relevant details
         ErrorResponse errorResponse = new ErrorResponse(
-                request.getRequestURI(),
-                HttpStatus.CONFLICT,
-                ex.getMessage(),
-                LocalDateTime.now()
+                request.getRequestURI(), // The URI where the exception occurred
+                HttpStatus.CONFLICT,     // HTTP status code 409
+                ex.getMessage(),         // The exception message
+                LocalDateTime.now()      // Timestamp of the error
         );
 
+        // Return the ErrorResponse wrapped in a ResponseEntity with status 409
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
-    // 2. ResourceNotFoundException Handler
+    /**
+     * Handles ResourceNotFoundException.
+     *
+     * @param ex      the exception thrown when a requested resource is not found
+     * @param request the HTTP request that resulted in the exception
+     * @return a ResponseEntity containing the ErrorResponse with HTTP status 404 (Not Found)
+     */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex, HttpServletRequest request) {
         logger.error("ResourceNotFoundException: {}", ex.getMessage());
@@ -51,7 +66,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    // 3. BadRequestException Handler
+    /**
+     * Handles BadRequestException.
+     *
+     * @param ex      the exception thrown for bad requests
+     * @param request the HTTP request that resulted in the exception
+     * @return a ResponseEntity containing the ErrorResponse with HTTP status 400 (Bad Request)
+     */
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex, HttpServletRequest request) {
         logger.error("BadRequestException: {}", ex.getMessage());
@@ -66,7 +87,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    // 4. ConflictException Handler
+    /**
+     * Handles ConflictException.
+     *
+     * @param ex      the exception thrown when a conflict occurs
+     * @param request the HTTP request that resulted in the exception
+     * @return a ResponseEntity containing the ErrorResponse with HTTP status 409 (Conflict)
+     */
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex, HttpServletRequest request) {
         logger.error("ConflictException: {}", ex.getMessage());
@@ -81,7 +108,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
-    // 5. UnauthorizedException Handler
+    /**
+     * Handles UnauthorizedException.
+     *
+     * @param ex      the exception thrown when unauthorized access is attempted
+     * @param request the HTTP request that resulted in the exception
+     * @return a ResponseEntity containing the ErrorResponse with HTTP status 401 (Unauthorized)
+     */
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException ex, HttpServletRequest request) {
         logger.error("UnauthorizedException: {}", ex.getMessage());
@@ -96,11 +129,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
-    // 6. MethodArgumentNotValidException Handler (DTO Doğrulama Hataları)
+    /**
+     * Handles MethodArgumentNotValidException.
+     * This exception is thrown when validation on an argument annotated with @Valid fails.
+     *
+     * @param ex      the exception containing validation errors
+     * @param request the HTTP request that resulted in the exception
+     * @return a ResponseEntity containing the ErrorResponse with HTTP status 400 (Bad Request)
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex, HttpServletRequest request) {
         logger.error("MethodArgumentNotValidException: {}", ex.getMessage());
 
+        // Collect validation errors into a map
         Map<String, String> validationErrors = new HashMap<>();
         for(FieldError error : ex.getBindingResult().getFieldErrors()) {
             validationErrors.put(error.getField(), error.getDefaultMessage());
@@ -116,7 +157,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
-    // 7. AccessDeniedException Handler (Spring Security)
+    /**
+     * Handles AccessDeniedException.
+     *
+     * @param ex      the exception thrown when access is denied
+     * @param request the HTTP request that resulted in the exception
+     * @return a ResponseEntity containing the ErrorResponse with HTTP status 403 (Forbidden)
+     */
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {
         logger.error("AccessDeniedException: {}", ex.getMessage());
@@ -166,7 +213,13 @@ public class GlobalExceptionHandler {
 //        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 //    }
 
-    // Genel İstisnalar için Handler
+    /**
+     * Handles all other exceptions not specifically handled by other methods.
+     *
+     * @param ex      the exception thrown
+     * @param request the HTTP request that resulted in the exception
+     * @return a ResponseEntity containing the ErrorResponse with HTTP status 500 (Internal Server Error)
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(

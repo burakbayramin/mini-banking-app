@@ -28,52 +28,53 @@ public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
-    private final UserServiceImpl userService;
     private final AccountMapper accountMapper;
 
     /**
-     * Yeni bir hesap oluşturur.
+     * Creates a new account for the specified user.
      *
-     * @param userId  Hesap oluşturacak kullanıcının UUID ID'si
-     * @param request Hesap oluşturma isteği DTO'su
-     * @return Oluşturulan hesabın detayları DTO'su
+     * @param userId  The UUID of the user for whom the account is being created.
+     * @param request The AccountCreateRequest containing account creation details.
+     * @throws ResourceNotFoundException if the user is not found.
+     * @throws ConflictException         if the account number or name already exists.
      */
     @Override
     @Transactional
     public void createAccount(UUID userId, AccountCreateRequest request) {
-        // Kullanıcıyı bul
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        // Hesap numarası kontrolü
         if (accountRepository.existsByNumber(request.getNumber())) {
             throw new ConflictException("Account number already exists!");
         }
 
-        // Hesap adı kontrolü
         if (accountRepository.existsByName(request.getName())) {
             throw new ConflictException("Account name already exists!");
         }
 
-        // Hesabı oluşturmak için mapper kullanılır, bakiye 100 olarak ayarlanır
         Account account = accountMapper.toAccount(request, user);
 
-        Account savedAccount = accountRepository.save(account);
+         accountRepository.save(account);
     }
 
     /**
-     * Hesapları arar ve filtreler.
+     * Searches for accounts belonging to a user based on provided search criteria.
      *
-     * @param userId  Hesapları arayan kullanıcının UUID ID'si
-     * @param request Arama isteği DTO'su
-     * @return Arama sonuçları DTO'larının listesi
+     * @param userId  The UUID of the user whose accounts are being searched.
+     * @param request The AccountSearchRequest containing search parameters.
+     * @return A list of AccountResponse DTOs matching the search criteria.
+     * @throws ResourceNotFoundException if the user is not found.
      */
     @Override
     @Transactional
     public List<AccountResponse> searchAccounts(UUID userId, AccountSearchRequest request) {
+        userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        // Prepare filters; default to empty strings if null to allow partial matching
         String numberFilter = (request.getNumber() != null) ? request.getNumber() : "";
         String nameFilter = (request.getName() != null) ? request.getName() : "";
 
+        // Retrieve accounts matching the user ID and containing the number and name filters
         List<Account> accounts = accountRepository.findByUserIdAndNumberContainingAndNameContaining(userId, numberFilter, nameFilter);
 
         return accounts.stream()
@@ -82,12 +83,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
-     * Hesap bilgilerini günceller.
+     * Updates the name of an existing account for a user.
      *
-     * @param userId    Hesap güncelleyecek kullanıcının UUID ID'si
-     * @param accountId Güncellenecek hesabın UUID ID'si
-     * @param request   Hesap güncelleme isteği DTO'su
-     * @return Güncellenen hesabın detayları DTO'su
+     * @param userId    The UUID of the user attempting to update the account.
+     * @param accountId The UUID of the account to be updated.
+     * @param request   The AccountUpdateRequest containing the new account name.
+     * @throws ResourceNotFoundException if the account is not found.
+     * @throws BadRequestException       if the user does not own the account.
+     * @throws ConflictException         if the new account name already exists.
      */
     @Override
     @Transactional
@@ -95,12 +98,10 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", accountId));
 
-        // Hesabın kullanıcıya ait olup olmadığını kontrol et
         if (!account.getUser().getId().equals(userId)) {
             throw new BadRequestException("You do not have permission to update this account.");
         }
 
-        // Hesap adının benzersizliğini kontrol et
         if (!account.getName().equals(request.getName()) && accountRepository.existsByName(request.getName())) {
             throw new ConflictException("Account name already exists!");
         }
@@ -110,10 +111,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
-     * Hesabı siler.
+     * Deletes an existing account for a user.
      *
-     * @param userId    Hesabı silmek isteyen kullanıcının UUID ID'si
-     * @param accountId Silinecek hesabın UUID ID'si
+     * @param userId    The UUID of the user attempting to delete the account.
+     * @param accountId The UUID of the account to be deleted.
+     * @throws ResourceNotFoundException if the account is not found.
+     * @throws BadRequestException       if the user does not own the account.
      */
     @Override
     @Transactional
@@ -121,7 +124,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", accountId));
 
-        // Hesabın kullanıcıya ait olup olmadığını kontrol et
+        // Verify that the account belongs to the user attempting the deletion
         if (!account.getUser().getId().equals(userId)) {
             throw new BadRequestException("You do not have permission to delete this account.");
         }
@@ -130,11 +133,13 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
-     * Hesap detaylarını getirir.
+     * Retrieves detailed information about a specific account for a user.
      *
-     * @param userId    Hesap detaylarını görmek isteyen kullanıcının UUID ID'si
-     * @param accountId Detayları getirilecek hesabın UUID ID'si
-     * @return Hesap detayları DTO'su
+     * @param userId    The UUID of the user requesting the account details.
+     * @param accountId The UUID of the account to retrieve details for.
+     * @return An AccountResponse DTO containing account details.
+     * @throws ResourceNotFoundException if the account is not found.
+     * @throws BadRequestException       if the user does not own the account.
      */
     @Override
     @Transactional
@@ -142,7 +147,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException("Account", "id", accountId));
 
-        // Hesabın kullanıcıya ait olup olmadığını kontrol et
+        // Verify that the account belongs to the user requesting the details
         if (!account.getUser().getId().equals(userId)) {
             throw new BadRequestException("You do not have permission to view this account.");
         }

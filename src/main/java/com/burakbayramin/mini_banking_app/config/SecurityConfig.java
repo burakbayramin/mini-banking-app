@@ -31,6 +31,13 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
+    /**
+     * Configures the security filter chain for the application.
+     *
+     * @param http the HttpSecurity to modify
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
+     */
     @Bean
     public SecurityFilterChain filterChain(org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
         http
@@ -41,6 +48,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 );
 
+        // Add the JWT authentication filter before the UsernamePasswordAuthenticationFilter in the filter chain
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
